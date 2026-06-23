@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosistema Logístico - Tareas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0b1120; color: #f8fafc; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        .hide { display: none !important; }
+        .glass { background: rgba(30,41,59,.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .pulse { animation: pulse 2s ease-in-out infinite; }
+        #view-selector { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+        #view-selector h1 { font-size:28px; font-weight:700; margin-bottom:32px; background:linear-gradient(90deg,#60a5fa,#34d399); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; width:100%; max-width:560px; }
+        .btn-card { padding:40px 20px; text-align:center; cursor:pointer; transition:all .2s; border:none; color:#f8fafc; font-family:inherit; }
+        .btn-card:hover { background:rgba(51,65,85,.8); transform:translateY(-2px); }
+        .btn-card .icon { width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:28px; }
+        .btn-card h2 { font-size:18px; font-weight:700; }
+        .icon-blue { background:rgba(59,130,246,.2); color:#60a5fa; }
+        .icon-green { background:rgba(16,185,129,.2); color:#34d399; }
+        .sync-banner { background:#f59e0b; color:#fff; font-size:12px; font-weight:700; padding:8px; text-align:center; position:absolute; top:0; left:0; right:0; z-index:100; border-radius:0 0 12px 12px; transition: all 0.3s ease; }
+        .sync-banner.offline { background:#ef4444; }
+        .sync-banner.online { background:#10b981; }
+        #view-operario { display:flex; flex-direction:column; padding:16px; max-width:420px; margin:0 auto; width:100%; min-height:100vh; position:relative; }
+        .back-btn { position:absolute; top:16px; left:16px; background:none; border:none; color:#94a3b8; cursor:pointer; font-size:20px; }
+        .back-btn:hover { color:#fff; }
+        .op-title { text-align:center; margin:48px 0 24px; font-size:22px; font-weight:700; }
+        .form-group { margin-bottom:20px; }
+        .form-group label { display:block; font-size:13px; color:#94a3b8; margin-bottom:8px; font-weight:600; }
+        .form-group select { width:100%; background:#0b1120; border:1px solid #334155; border-radius:12px; padding:14px 16px; color:#fff; font-size:15px; font-family:inherit; outline:none; }
+        .form-group select:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.3); }
+        .form-group input[type="text"] { width:100%; background:#0b1120; border:1px solid #334155; border-radius:12px; padding:14px 16px; color:#fff; font-size:15px; font-family:inherit; outline:none; margin-top:8px; }
+        .form-group input[type="text"]:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.3); }
+        .btn-primary { width:100%; padding:16px; border:none; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+        .btn-blue { background:#2563eb; color:#fff; box-shadow:0 8px 20px rgba(37,99,235,.3); }
+        .btn-blue:hover { background:#3b82f6; }
+        .btn-blue:active { transform:scale(.97); }
+        .btn-red { background:#dc2626; color:#fff; box-shadow:0 8px 20px rgba(220,38,38,.3); }
+        .btn-red:hover { background:#ef4444; }
+        .btn-red:active { transform:scale(.97); }
+        .active-panel { text-align:center; padding:32px 24px; }
+        .badge-en-curso { display:inline-block; padding:6px 16px; border-radius:20px; background:rgba(16,185,129,.15); color:#34d399; font-size:13px; font-weight:700; border:1px solid rgba(16,185,129,.3); margin-bottom:24px; }
+        .task-label { font-size:18px; color:#94a3b8; margin-bottom:8px; }
+        .stopwatch { font-size:56px; font-weight:700; font-family:'Courier New',monospace; letter-spacing:4px; margin-bottom:40px; }
+        #view-admin { display:flex; flex-direction:column; min-height:100vh; }
+        .admin-header { padding:16px 24px; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(255,255,255,.08); background:rgba(30,41,59,.85); backdrop-filter:blur(12px); position:sticky; top:0; z-index:10; }
+        .admin-header h1 { font-size:18px; font-weight:700; }
+        .admin-header h1 span { color:#34d399; }
+        .admin-main { flex:1; padding:20px; overflow:auto; }
+        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+        @media(max-width:800px) { .stats-grid { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:480px) { .stats-grid { grid-template-columns:1fr; } .btn-grid { grid-template-columns:1fr; } }
+        .stat-card { padding:18px; border-radius:14px; overflow:hidden; }
+        .stat-card .stat-label { font-size:11px; font-weight:600; color:#64748b; letter-spacing:1px; margin-bottom:6px; }
+        .stat-card .stat-value { font-size:26px; font-weight:700; }
+        .stat-card .stat-value-sm { font-size:15px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .border-blue { border-left:4px solid #3b82f6; }
+        .border-green { border-left:4px solid #10b981; }
+        .border-amber { border-left:4px solid #f59e0b; }
+        .border-red { border-left:4px solid #ef4444; }
+        .text-amber { color:#fbbf24; }
+        .text-red { color:#f87171; }
+        .table-wrap { border-radius:14px; overflow:hidden; }
+        table { width:100%; border-collapse:collapse; text-align:left; }
+        thead tr { background:rgba(51,65,85,.5); border-bottom:1px solid #334155; }
+        th { padding:14px 16px; font-size:13px; font-weight:600; color:#94a3b8; }
+        td { padding:14px 16px; font-size:13px; }
+        tbody tr { border-bottom:1px solid rgba(51,65,85,.4); }
+        tbody tr:hover { background:rgba(51,65,85,.3); }
+        .text-blue { color:#60a5fa; }
+        .text-muted { color:#64748b; }
+        .badge { display:inline-block; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; }
+        .badge-active { background:rgba(16,185,129,.15); color:#34d399; }
+        .badge-done { background:rgba(51,65,85,.6); color:#94a3b8; }
+        .mono { font-family:'Courier New',monospace; }
+        .empty-msg { padding:48px; text-align:center; color:#475569; font-size:14px; }
+    </style>
+</head>
+<body>
+
+    <!-- ============ SELECTOR ============ -->
+    <div id="view-selector">
+        <h1>Módulo de Tareas</h1>
+        <div class="btn-grid">
+            <button class="glass btn-card" onclick="openView('operario')">
+                <div class="icon icon-blue">📱</div>
+                <h2>Terminal Operario</h2>
+            </button>
+            <button class="glass btn-card" onclick="openView('admin')">
+                <div class="icon icon-green">📊</div>
+                <h2>Monitor Supervisor</h2>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============ OPERARIO ============ -->
+    <div id="view-operario" class="hide">
+        <div id="sync-status" class="sync-banner hide">Conectando...</div>
+        <button class="back-btn" onclick="openView('selector')" style="margin-top: 16px;">← Volver</button>
+        <div class="op-title" style="margin-top: 56px;">Registro de Tareas</div>
+
+        <div id="op-form" class="glass" style="padding:24px;">
+            <div class="form-group">
+                <label>Operario</label>
+                <select id="op-name">
+                    <option value="">Seleccionar operario...</option>
+                    <option value="FLOR QUINTEROS">FLOR QUINTEROS</option>
+                    <option value="JUAN CRUZ FERREYRA">JUAN CRUZ FERREYRA</option>
+                    <option value="NICOLAS AYALA">NICOLAS AYALA</option>
+                    <option value="BRUNO AYALA">BRUNO AYALA</option>
+                    <option value="AGUSTIN MADRID">AGUSTIN MADRID</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tarea a realizar</label>
+                <select id="op-task" onchange="toggleCustomTask()">
+                    <option value="">Seleccionar tarea...</option>
+                    <option value="QUIEBRE/ANALISIS">QUIEBRE/ANALISIS</option>
+                    <option value="REPORTE 24/14">REPORTE 24/14</option>
+                    <option value="AGEING">AGEING</option>
+                    <option value="GRAFICA DE VACIAS">GRAFICA DE VACIAS</option>
+                    <option value="ANALISIS DE INTRUSOS">ANALISIS DE INTRUSOS</option>
+                    <option value="UNIFICACION altura (GENERAR LUGAR)">UNIFICACION altura (GENERAR LUGAR)</option>
+                    <option value="CICLICOS (GENERAL)">CICLICOS (GENERAL)</option>
+                    <option value="LLENADO DE VALDAS">LLENADO DE VALDAS</option>
+                    <option value="UNIFICACION (PICKING)">UNIFICACION (PICKING)</option>
+                    <option value="REABASTECIMIENTO DE MONO PROD.">REABASTECIMIENTO DE MONO PROD.</option>
+                    <option value="ANALISIS DE SOBRANTES REALES">ANALISIS DE SOBRANTES REALES</option>
+                    <option value="SOLICITUD DE FOTOS">SOLICITUD DE FOTOS</option>
+                    <option value="ANALISIS SOLICITADOS POR ADMINISTRACION">ANALISIS SOLICITADOS POR ADMINISTRACION</option>
+                    <option value="SOLICITUD DE AJUSTES">SOLICITUD DE AJUSTES</option>
+                    <option value="RECLAMOS">RECLAMOS</option>
+                    <option value="INFORMES DE KPI">INFORMES DE KPI</option>
+                    <option value="SCRAP">SCRAP</option>
+                    <option value="DEVOLUCION DE SOBRANTES DE MESA">DEVOLUCION DE SOBRANTES DE MESA</option>
+                    <option value="ANALISIS BLOQUEADOS">ANALISIS BLOQUEADOS</option>
+                    <option value="SEGUNDO CONTROL DE DIFERENCIAS DE IMPO">SEGUNDO CONTROL DE DIFERENCIAS DE IMPO</option>
+                    <option value="__OTRA__">✏️ OTRA TAREA (escribir)</option>
+                </select>
+                <input type="text" id="op-task-custom" class="hide" placeholder="Escribí la tarea...">
+            </div>
+            <button class="btn-primary btn-blue" onclick="startTask()">INICIAR TAREA</button>
+        </div>
+
+        <div id="op-active" class="hide glass active-panel">
+            <div class="badge-en-curso pulse">EN CURSO</div>
+            <div class="task-label" id="active-task-name"></div>
+            <div class="stopwatch" id="stopwatch">00:00:00</div>
+            <button class="btn-primary btn-red" onclick="stopTask()">TERMINAR TAREA</button>
+        </div>
+    </div>
+
+    <!-- ============ ADMIN ============ -->
+    <div id="view-admin" class="hide">
+        <div class="admin-header glass">
+            <button class="back-btn" style="position:static" onclick="openView('selector')">←</button>
+            <h1>Monitor de Tareas <span>Live Nube</span></h1>
+        </div>
+        <div class="admin-main">
+            <div class="stats-grid">
+                <div class="glass stat-card border-blue">
+                    <div class="stat-label">USUARIOS CONECTADOS</div>
+                    <div class="stat-value" id="stat-conectados">0</div>
+                </div>
+                <div class="glass stat-card border-green">
+                    <div class="stat-label">TAREAS FINALIZADAS</div>
+                    <div class="stat-value" id="stat-finished">0</div>
+                </div>
+                <div class="glass stat-card border-amber">
+                    <div class="stat-label">TAREA MÁS REALIZADA</div>
+                    <div class="stat-value-sm text-amber" id="stat-top-task">-</div>
+                </div>
+                <div class="glass stat-card border-red">
+                    <div class="stat-label">MAYOR TIEMPO</div>
+                    <div class="stat-value-sm text-red" id="stat-max-time">-</div>
+                </div>
+            </div>
+            <div class="glass table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operario</th>
+                            <th>Tarea</th>
+                            <th>Hora Inicio</th>
+                            <th>Duración</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body"></tbody>
+                </table>
+                <div id="empty-state" class="empty-msg">Cargando datos de la nube...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var activeTask = JSON.parse(localStorage.getItem('logisticaActiveTask')) || null;
+        var syncQueue = JSON.parse(localStorage.getItem('logisticaSyncQueue')) || [];
+        var timerInterval = null;
+
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+
+        function updateNetworkStatus() {
+            var banner = document.getElementById('sync-status');
+            banner.classList.remove('hide');
+            if (!navigator.onLine) {
+                banner.innerText = '⚠️ Sin Conexión (Modo Offline)';
+                banner.className = 'sync-banner offline';
+            } else {
+                if (syncQueue.length > 0) {
+                    banner.innerText = '🔄 Sincronizando ' + syncQueue.length + ' tareas pendientes...';
+                    banner.className = 'sync-banner';
+                    processSyncQueue();
+                } else {
+                    banner.innerText = '✅ Conexión Establecida';
+                    banner.className = 'sync-banner online';
+                    setTimeout(function(){ banner.classList.add('hide'); }, 3000);
+                }
+            }
+        }
+
+        function safeGuardar(task) {
+            if (!navigator.onLine) {
+                pushToQueue(task);
+            } else {
+                google.script.run
+                    .withSuccessHandler(function(){
+                         processSyncQueue();
+                    })
+                    .withFailureHandler(function(err){
+                         pushToQueue(task);
+                    })
+                    .guardarEnSheets(task);
+            }
+        }
+
+        function pushToQueue(task) {
+            syncQueue.push(task);
+            localStorage.setItem('logisticaSyncQueue', JSON.stringify(syncQueue));
+            updateNetworkStatus();
+        }
+
+        function processSyncQueue() {
+            if (!navigator.onLine || syncQueue.length === 0) return;
+            var task = syncQueue[0];
+            google.script.run
+                .withSuccessHandler(function() {
+                    syncQueue.shift();
+                    localStorage.setItem('logisticaSyncQueue', JSON.stringify(syncQueue));
+                    processSyncQueue();
+                })
+                .withFailureHandler(function(err) {
+                    console.log("Reintento fallido", err);
+                })
+                .guardarEnSheets(task);
+        }
+
+        function toggleCustomTask() {
+            var sel = document.getElementById('op-task');
+            var inp = document.getElementById('op-task-custom');
+            if (sel.value === '__OTRA__') {
+                inp.classList.remove('hide');
+                inp.focus();
+            } else {
+                inp.classList.add('hide');
+            }
+        }
+
+        function getTaskValue() {
+            var sel = document.getElementById('op-task');
+            var inp = document.getElementById('op-task-custom');
+            return sel.value === '__OTRA__' ? inp.value.trim() : sel.value;
+        }
+
+        function openView(v) {
+            document.getElementById('view-selector').classList.add('hide');
+            document.getElementById('view-operario').classList.add('hide');
+            document.getElementById('view-admin').classList.add('hide');
+            if (v === 'selector') document.getElementById('view-selector').classList.remove('hide');
+            if (v === 'operario') document.getElementById('view-operario').classList.remove('hide');
+            if (v === 'admin') { document.getElementById('view-admin').classList.remove('hide'); updateAdminDashboard(); }
+        }
+
+        function startTask() {
+            var opName = document.getElementById('op-name').value;
+            var opTask = getTaskValue();
+            if (!opName || !opTask) return alert("Selecciona operario y tarea.");
+
+            var now = new Date();
+            activeTask = {
+                id: Date.now(), operario: opName, tarea: opTask,
+                inicioMs: now.getTime(),
+                inicioFmt: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+                finFmt: '-', duracion: '00:00:00', estado: 'EN CURSO'
+            };
+            localStorage.setItem('logisticaActiveTask', JSON.stringify(activeTask));
+
+            document.getElementById('op-form').classList.add('hide');
+            document.getElementById('op-active').classList.remove('hide');
+            document.getElementById('active-task-name').innerText = opTask;
+            startStopwatch(now.getTime());
+
+            safeGuardar(activeTask);
+        }
+
+        function stopTask() {
+            clearInterval(timerInterval);
+            var now = new Date();
+            if (activeTask) {
+                activeTask.estado = 'FINALIZADO';
+                activeTask.finFmt = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                safeGuardar(activeTask);
+            }
+            
+            activeTask = null;
+            localStorage.removeItem('logisticaActiveTask');
+
+            document.getElementById('stopwatch').innerText = "00:00:00";
+            document.getElementById('op-form').classList.remove('hide');
+            document.getElementById('op-active').classList.add('hide');
+            document.getElementById('op-task').value = "";
+            document.getElementById('op-task-custom').value = "";
+            document.getElementById('op-task-custom').classList.add('hide');
+        }
+
+        function startStopwatch(startMs) {
+            timerInterval = setInterval(function() {
+                var d = Date.now() - startMs;
+                var h = Math.floor(d / 3600000);
+                var m = Math.floor((d % 3600000) / 60000);
+                var s = Math.floor((d % 60000) / 1000);
+                var f = String(h).padStart(2,'0')+":"+String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
+                document.getElementById('stopwatch').innerText = f;
+                if (activeTask) {
+                    activeTask.duracion = f;
+                    localStorage.setItem('logisticaActiveTask', JSON.stringify(activeTask));
+                }
+            }, 1000);
+        }
+
+        function updateAdminDashboard() {
+            if (document.getElementById('view-admin').classList.contains('hide')) return;
+            if (!navigator.onLine) {
+                var empty = document.getElementById('empty-state');
+                document.getElementById('admin-table-body').innerHTML = "";
+                empty.style.display = "block";
+                empty.innerText = "⚠️ Sin conexión (pausado)";
+                return;
+            }
+
+            google.script.run.withSuccessHandler(function(datos) {
+                var enCurso = datos.filter(function(t){ return t.estado === 'EN CURSO'; });
+                var finalizados = datos.filter(function(t){ return t.estado === 'FINALIZADO'; });
+
+                var nombres = {};
+                enCurso.forEach(function(t){ nombres[t.operario] = true; });
+                document.getElementById('stat-conectados').innerText = Object.keys(nombres).length;
+
+                document.getElementById('stat-finished').innerText = finalizados.length;
+
+                var cnt = {};
+                datos.forEach(function(t){ if(t.tarea) cnt[t.tarea] = (cnt[t.tarea]||0)+1; });
+                var topT = "-", topN = 0;
+                for (var k in cnt) { if (cnt[k] > topN) { topN = cnt[k]; topT = k; } }
+                document.getElementById('stat-top-task').innerText = topT;
+
+                var maxS = 0, maxLabel = "-";
+                datos.forEach(function(t) {
+                    if (t.duracion && t.duracion.indexOf(":") > -1) {
+                        var p = t.duracion.split(":");
+                        var seg = (+p[0])*3600 + (+p[1])*60 + (+p[2]);
+                        if (seg > maxS) { maxS = seg; maxLabel = t.tarea + " (" + t.duracion + ")"; }
+                    }
+                });
+                document.getElementById('stat-max-time').innerText = maxLabel;
+
+                var tbody = document.getElementById('admin-table-body');
+                var empty = document.getElementById('empty-state');
+                if (datos.length === 0) { tbody.innerHTML = ""; empty.style.display = "block"; empty.innerText = "No hay datos aún"; return; }
+                empty.style.display = "none";
+                var html = "";
+                for (var i = datos.length - 1; i >= 0; i--) {
+                    var t = datos[i];
+                    var isAct = t.estado === 'EN CURSO';
+                    var badge = isAct
+                        ? '<span class="badge badge-active pulse">EN CURSO</span>'
+                        : '<span class="badge badge-done">FINALIZADO</span>';
+                    html += '<tr>'
+                        + '<td style="font-weight:600">' + t.operario + '</td>'
+                        + '<td class="text-blue">' + t.tarea + '</td>'
+                        + '<td class="text-muted">' + t.inicioFmt + '</td>'
+                        + '<td class="mono">' + (t.duracion || '-') + '</td>'
+                        + '<td>' + badge + '</td>'
+                        + '</tr>';
+                }
+                tbody.innerHTML = html;
+            }).withFailureHandler(function(err){
+                console.log("Error obteniendo datos", err);
+            }).obtenerDatosDeSheets();
+        }
+
+        function initApp() {
+            if (activeTask) {
+                document.getElementById('op-form').classList.add('hide');
+                document.getElementById('op-active').classList.remove('hide');
+                document.getElementById('active-task-name').innerText = activeTask.tarea;
+                startStopwatch(activeTask.inicioMs);
+                document.getElementById('op-name').value = activeTask.operario || "";
+                var taskSelect = document.getElementById('op-task');
+                var taskCustom = document.getElementById('op-task-custom');
+                var found = false;
+                for (var i = 0; i < taskSelect.options.length; i++) {
+                    if (taskSelect.options[i].value === activeTask.tarea) {
+                        taskSelect.value = activeTask.tarea;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    taskSelect.value = '__OTRA__';
+                    taskCustom.value = activeTask.tarea;
+                    taskCustom.classList.remove('hide');
+                }
+            }
+            updateNetworkStatus();
+        }
+
+        initApp();
+        setInterval(updateAdminDashboard, 5000);
+    </script>
+</body>
+</html>
