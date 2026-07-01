@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema Logístico - Tareas</title>
+    <title>Ecosistema Logístico - Tareas (TEST)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -140,6 +140,7 @@
         .alert-filtro-pill { padding:4px 12px; border-radius:20px; font-size:.72rem; font-weight:600; cursor:pointer; border:1.5px solid rgba(255,255,255,.1); color:#64748b; transition:all .15s; user-select:none; background:transparent; }
         .alert-filtro-pill:hover { border-color:#3b82f6; color:#f8fafc; }
         .alert-filtro-pill.active { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+        .test-badge { position:fixed; bottom:12px; right:12px; background:#f59e0b; color:#000; font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; z-index:999; opacity:.8; }
     </style>
 </head>
 <body>
@@ -342,14 +343,10 @@
         </div>
     </div>
 
-    <script>
-        var activeTask = JSON.parse(localStorage.getItem('logisticaActiveTask')) || null;
-        var syncQueue = JSON.parse(localStorage.getItem('logisticaSyncQueue')) || [];
-        var timerInterval = null;
-        var fechaFiltro = null;
-        var datosCompletos = [];
-        var tabActual = 'monitor';
+    <!-- test badge -->
+    <div class="test-badge">🧪 MODO TEST</div>
 
+    <script>
         // ========== TAREAS DEL SECTOR INVENTARIO ==========
         var TAREAS_INVENTARIO = [
             {tarea:"QUIEBRE/ANALISIS",frecuencia:"DIARIO",reqMaq:true,objetivo:"Evitar faltantes y garantizar disponibilidad de stock."},
@@ -373,6 +370,80 @@
             {tarea:"ANALISIS BLOQUEADOS",frecuencia:"DIARIO",reqMaq:false,objetivo:"Reducir quiebres en pedidos y bajar el indicador de recortes."},
             {tarea:"SEGUNDO CONTROL DE DIFERENCIAS DE IMPO",frecuencia:"SEMANAL",reqMaq:true,objetivo:"Identificar diferencias en importaciones recibidas."}
         ];
+
+        // ========== DATOS DE PRUEBA ==========
+        var TEST_DATA = [
+            {id:1782299996919,operario:"JUAN CRUZ FERREYRA",tarea:"QUIEBRE/ANALISIS",inicioMs:1750753140000,inicioFmt:"08:19",finFmt:"09:02",duracion:"0:42:25",estado:"FINALIZADO"},
+            {id:1782300070745,operario:"FLOR QUINTEROS",tarea:"ANALISIS SOLICITADOS POR ADMINISTRACION",inicioMs:1750753260000,inicioFmt:"08:21",finFmt:"08:58",duracion:"0:37:27",estado:"FINALIZADO"},
+            {id:1782302588387,operario:"JUAN CRUZ FERREYRA",tarea:"Traslados para generar lugar para CHERY",inicioMs:1750753980000,inicioFmt:"09:03",finFmt:"09:11",duracion:"0:08:42",estado:"FINALIZADO"},
+            {id:1782303443235,operario:"FLOR QUINTEROS",tarea:"TRASLADOS DE KITS A CALLES \"X & V\"",inicioMs:1750754820000,inicioFmt:"09:17",finFmt:"10:46",duracion:"1:06:11",estado:"FINALIZADO"},
+            {id:1782303453333,operario:"JUAN CRUZ FERREYRA",tarea:"TRASLADOS PARA LUGAR EN CHERY",inicioMs:1750754820000,inicioFmt:"09:17",finFmt:"09:45",duracion:"0:27:46",estado:"FINALIZADO"},
+            {id:1782305136914,operario:"JUAN CRUZ FERREYRA",tarea:"SEGUNDO CONTROL DE ING RECEPCION",inicioMs:1750755900000,inicioFmt:"09:45",finFmt:"10:59",duracion:"0:04:43",estado:"FINALIZADO"},
+            {id:1782305480813,operario:"BRUNO AYALA",tarea:"CICLICOS (GENERAL)",inicioMs:1750756260000,inicioFmt:"09:51",finFmt:"15:20",duracion:"3:22:15",estado:"FINALIZADO"},
+            {id:1782305890989,operario:"JUAN CRUZ FERREYRA",tarea:"Traslados para lugar en CHERY",inicioMs:1750756680000,inicioFmt:"09:58",finFmt:"10:00",duracion:"0:02:47",estado:"FINALIZADO"},
+            {id:1782306076655,operario:"JUAN CRUZ FERREYRA",tarea:"REUNION",inicioMs:1750756860000,inicioFmt:"10:01",finFmt:"10:59",duracion:"0:58:08",estado:"FINALIZADO"},
+            {id:1782308803716,operario:"FLOR QUINTEROS",tarea:"UNIFICACION (PICKING)",inicioMs:1750758360000,inicioFmt:"10:46",finFmt:"11:38",duracion:"0:52:02",estado:"FINALIZADO"},
+            {id:1782309837345,operario:"JUAN CRUZ FERREYRA",tarea:"AGEING",inicioMs:1750759380000,inicioFmt:"11:03",finFmt:"12:23",duracion:"0:00:03",estado:"FINALIZADO"},
+            {id:1782312065237,operario:"FLOR QUINTEROS",tarea:"ANALISIS SOLICITADOS POR ADMINISTRACION",inicioMs:1750760460000,inicioFmt:"11:41",finFmt:"13:43",duracion:"1:50:59",estado:"FINALIZADO"},
+            {id:1782314652326,operario:"JUAN CRUZ FERREYRA",tarea:"traslado lugar para chery",inicioMs:1750764240000,inicioFmt:"12:24",finFmt:"12:56",duracion:"0:32:40",estado:"FINALIZADO"},
+            {id:1782317064972,operario:"JUAN CRUZ FERREYRA",tarea:"AGEING",inicioMs:1750766640000,inicioFmt:"13:04",finFmt:"13:25",duracion:"0:02:34",estado:"FINALIZADO"},
+            {id:1782318346528,operario:"JUAN CRUZ FERREYRA",tarea:"almacenamiento por sistema",inicioMs:1750767900000,inicioFmt:"13:25",finFmt:"13:59",duracion:"0:33:53",estado:"FINALIZADO"},
+            {id:1782319445390,operario:"BRUNO AYALA",tarea:"ingreso",inicioMs:1750769040000,inicioFmt:"13:44",finFmt:"14:29",duracion:"0:45:52",estado:"FINALIZADO"},
+            {id:1782322220724,operario:"BRUNO AYALA",tarea:"traslados",inicioMs:1750770600000,inicioFmt:"14:30",finFmt:"14:40",duracion:"0:10:33",estado:"FINALIZADO"},
+            {id:1782325741960,operario:"BRUNO AYALA",tarea:"UNIFICACION (PICKING)",inicioMs:1750774140000,inicioFmt:"15:29",finFmt:"17:45",duracion:"1:20:04",estado:"FINALIZADO"},
+            {id:1782378791239,operario:"FLOR QUINTEROS",tarea:"UNIFICACION (PICKING)",inicioMs:1750839180000,inicioFmt:"06:13",finFmt:"14:03",duracion:"7:50:01",estado:"FINALIZADO"},
+            {id:1782379149107,operario:"JUAN CRUZ FERREYRA",tarea:"QUIEBRE/ANALISIS",inicioMs:1750839540000,inicioFmt:"06:19",finFmt:"08:32",duracion:"2:13:43",estado:"FINALIZADO"},
+            {id:1782387200881,operario:"JUAN CRUZ FERREYRA",tarea:"generar lugar para cajon de FOTON",inicioMs:1750843980000,inicioFmt:"08:33",finFmt:"11:09",duracion:"2:35:58",estado:"FINALIZADO"},
+            {id:1782390810157,operario:"BRUNO AYALA",tarea:"CICLICOS (GENERAL)",inicioMs:1750846380000,inicioFmt:"09:33",finFmt:"17:33",duracion:"7:59:38",estado:"FINALIZADO"},
+            {id:1782396570051,operario:"JUAN CRUZ FERREYRA",tarea:"INGRESO EN RECEPCION",inicioMs:1750853340000,inicioFmt:"11:09",finFmt:"15:04",duracion:"3:54:52",estado:"FINALIZADO"},
+            {id:1782410665897,operario:"JUAN CRUZ FERREYRA",tarea:"AGEING",inicioMs:1750863840000,inicioFmt:"15:04",finFmt:"17:20",duracion:"2:15:36",estado:"FINALIZADO"},
+            {id:1782418812329,operario:"JUAN CRUZ FERREYRA",tarea:"busqueda de quiebre",inicioMs:1750868400000,inicioFmt:"17:20",finFmt:"17:47",duracion:"0:27:32",estado:"FINALIZADO"},
+            {id:1782419981803,operario:"BRUNO AYALA",tarea:"QUIEBRE/ANALISIS",inicioMs:1750869540000,inicioFmt:"17:39",finFmt:"17:45",duracion:"0:05:22",estado:"FINALIZADO"},
+            {id:1782464963730,operario:"JUAN CRUZ FERREYRA",tarea:"QUIEBRE/ANALISIS",inicioMs:1750925340000,inicioFmt:"06:09",finFmt:"08:52",duracion:"2:42:50",estado:"FINALIZADO"},
+            {id:1782468286766,operario:"FLOR QUINTEROS",tarea:"UNIFICACION (PICKING)",inicioMs:1750928640000,inicioFmt:"07:04",finFmt:"12:31",duracion:"5:26:18",estado:"FINALIZADO"},
+            {id:1782474739592,operario:"JUAN CRUZ FERREYRA",tarea:"CICLICOS (GENERAL)",inicioMs:1750932720000,inicioFmt:"08:52",finFmt:"10:04",duracion:"1:12:15",estado:"FINALIZADO"},
+            {id:1782478086531,operario:"BRUNO AYALA",tarea:"UNIFICACION altura (GENERAR LUGAR)",inicioMs:1750934880000,inicioFmt:"09:48",finFmt:"17:37",duracion:"5:45:33",estado:"FINALIZADO"},
+            {id:1782478147912,operario:"BRUNO AYALA",tarea:"ANALISIS DE SOBRANTES REALES",inicioMs:1750934940000,inicioFmt:"09:49",finFmt:"10:16",duracion:"0:27:21",estado:"FINALIZADO"},
+            {id:1782479106891,operario:"JUAN CRUZ FERREYRA",tarea:"Liberar ubicaciones para lugar en CHERY",inicioMs:1750935900000,inicioFmt:"10:05",finFmt:"11:45",duracion:"1:40:31",estado:"FINALIZADO"},
+            {id:1782485165014,operario:"JUAN CRUZ FERREYRA",tarea:"revision de articulo en analisis",inicioMs:1750938360000,inicioFmt:"11:46",finFmt:"11:59",duracion:"0:13:07",estado:"FINALIZADO"},
+            {id:1782485967413,operario:"JUAN CRUZ FERREYRA",tarea:"REACONDICIONAMIENTO DE PALLET",inicioMs:1750939140000,inicioFmt:"11:59",finFmt:"12:24",duracion:"0:25:05",estado:"FINALIZADO"},
+            {id:1782487505778,operario:"JUAN CRUZ FERREYRA",tarea:"AGEING",inicioMs:1750940700000,inicioFmt:"12:25",finFmt:"14:02",duracion:"1:36:59",estado:"FINALIZADO"},
+            {id:1782488495887,operario:"FLOR QUINTEROS",tarea:"UNIFICACION altura (GENERAR LUGAR)",inicioMs:1750941660000,inicioFmt:"12:41",finFmt:"14:02",duracion:"1:10:01",estado:"FINALIZADO"},
+            {id:1782501444813,operario:"BRUNO AYALA",tarea:"QUIEBRE/ANALISIS",inicioMs:1750951020000,inicioFmt:"16:17",finFmt:"16:53",duracion:"0:36:31",estado:"FINALIZADO"},
+            {id:1782724461422,operario:"FLOR QUINTEROS",tarea:"ANALISIS SOLICITADOS POR ADMINISTRACION",inicioMs:1751184840000,inicioFmt:"06:14",finFmt:"06:59",duracion:"0:44:48",estado:"FINALIZADO"},
+            {id:1782724908694,operario:"JUAN CRUZ FERREYRA",tarea:"busqueda de pallet perdido",inicioMs:1751185260000,inicioFmt:"06:21",finFmt:"10:45",duracion:"1:21:21",estado:"FINALIZADO"},
+            {id:1782727142537,operario:"JUAN CRUZ FERREYRA",tarea:"QUIEBRE/ANALISIS",inicioMs:1751187540000,inicioFmt:"06:59",finFmt:"10:01",duracion:"3:02:40",estado:"FINALIZADO"},
+            {id:1782728367772,operario:"FLOR QUINTEROS",tarea:"CONTROL DE PALLETS SIN SKU",inicioMs:1751188740000,inicioFmt:"07:19",finFmt:"08:44",duracion:"1:25:26",estado:"FINALIZADO"},
+            {id:1782732663126,operario:"BRUNO AYALA",tarea:"SEGUNDO CONTROL DE DIFERENCIAS DE IMPO",inicioMs:1751190660000,inicioFmt:"08:31",finFmt:"09:05",duracion:"0:34:29",estado:"FINALIZADO"},
+            {id:1782733530258,operario:"FLOR QUINTEROS",tarea:"ANALISIS POSIBLE CRUCE",inicioMs:1751191500000,inicioFmt:"08:45",finFmt:"10:52",duracion:"1:48:17",estado:"FINALIZADO"},
+            {id:1782734746261,operario:"BRUNO AYALA",tarea:"CICLICO CHERY",inicioMs:1751192700000,inicioFmt:"09:05",finFmt:"13:12",duracion:"3:42:51",estado:"FINALIZADO"},
+            {id:1782744573534,operario:"FLOR QUINTEROS",tarea:"UNIFICACION altura (GENERAR LUGAR)",inicioMs:1751197740000,inicioFmt:"11:49",finFmt:"14:19",duracion:"2:30:08",estado:"FINALIZADO"},
+            {id:1782745689142,operario:"JUAN CRUZ FERREYRA",tarea:"Traslados de ubi para lugar en CHERY",inicioMs:1751202480000,inicioFmt:"12:08",finFmt:"13:24",duracion:"1:16:44",estado:"FINALIZADO"},
+            {id:1782748175142,operario:"BRUNO AYALA",tarea:"ANALISIS CHERY",inicioMs:1751203740000,inicioFmt:"12:49",finFmt:"13:58",duracion:"1:08:21",estado:"FINALIZADO"},
+            {id:1782750305587,operario:"JUAN CRUZ FERREYRA",tarea:"busqueda de analisis de chery",inicioMs:1751205900000,inicioFmt:"13:25",finFmt:"13:26",duracion:"0:01:30",estado:"FINALIZADO"},
+            {id:1782750412977,operario:"JUAN CRUZ FERREYRA",tarea:"AGEING",inicioMs:1751205960000,inicioFmt:"13:26",finFmt:"13:49",duracion:"0:22:53",estado:"FINALIZADO"},
+            {id:1782752314586,operario:"BRUNO AYALA",tarea:"INVENTARIO CHERY",inicioMs:1751206680000,inicioFmt:"13:58",finFmt:"15:09",duracion:"0:22:23",estado:"FINALIZADO"},
+            {id:1782752620554,operario:"BRUNO AYALA",tarea:"SOLICITUD DE FOTOS",inicioMs:1751206980000,inicioFmt:"14:03",finFmt:"14:21",duracion:"0:17:51",estado:"FINALIZADO"},
+            {id:1782754850396,operario:"BRUNO AYALA",tarea:"ANALISIS CHERY",inicioMs:1751208000000,inicioFmt:"14:40",finFmt:"15:09",duracion:"0:28:49",estado:"FINALIZADO"},
+            {id:1782756840805,operario:"JUAN CRUZ FERREYRA",tarea:"busqueda de pallet perdido",inicioMs:1751210040000,inicioFmt:"15:14",finFmt:"15:28",duracion:"0:14:04",estado:"FINALIZADO"},
+            {id:1782810768310,operario:"FLOR QUINTEROS",tarea:"SEGUNDO CONTROL DE DIFERENCIAS DE IMPO",inicioMs:1751271120000,inicioFmt:"06:12",finFmt:"06:21",duracion:"0:08:46",estado:"FINALIZADO"},
+            {id:1782811248410,operario:"JUAN CRUZ FERREYRA",tarea:"QUIEBRE/ANALISIS",inicioMs:1751271600000,inicioFmt:"06:20",finFmt:"07:48",duracion:"1:27:17",estado:"FINALIZADO"},
+            {id:1782811302185,operario:"FLOR QUINTEROS",tarea:"UNIFICACION altura (GENERAR LUGAR)",inicioMs:1751271660000,inicioFmt:"06:21",finFmt:"",duracion:"",estado:"EN CURSO"},
+            {id:1782816499444,operario:"JUAN CRUZ FERREYRA",tarea:"Traslados para lugar en CHERY",inicioMs:1751274480000,inicioFmt:"07:48",finFmt:"",duracion:"",estado:"EN CURSO"},
+            {id:1782816972388,operario:"BRUNO AYALA",tarea:"CICLICO GENERAL CHERY",inicioMs:1751274960000,inicioFmt:"07:56",finFmt:"",duracion:"",estado:"EN CURSO"}
+        ];
+        
+        // Corregir timestamps a 2026 (estaban en 2025)
+        var TS_FIX = new Date(2026, 5, 24, 8, 19).getTime() - 1750753140000;
+        TEST_DATA.forEach(function(t){ if (t.inicioMs) t.inicioMs += TS_FIX; });
+        
+        // ========== APP LOGIC ==========
+        var activeTask = JSON.parse(localStorage.getItem('logisticaActiveTestTask')) || null;
+        var syncQueue = JSON.parse(localStorage.getItem('logisticaSyncTestQueue')) || [];
+        var timerInterval = null;
+        var fechaFiltro = null;
+        var datosCompletos = [];
+        var tabActual = 'monitor';
 
         function switchAdminTab(tab) {
             tabActual = tab;
@@ -451,36 +522,22 @@
             if (!navigator.onLine) {
                 pushToQueue(task);
             } else {
-                google.script.run
-                    .withSuccessHandler(function(){
-                         processSyncQueue();
-                    })
-                    .withFailureHandler(function(err){
-                         pushToQueue(task);
-                    })
-                    .guardarEnSheets(task);
+                pushToQueue(task);
+                processSyncQueue();
             }
         }
 
         function pushToQueue(task) {
             syncQueue.push(task);
-            localStorage.setItem('logisticaSyncQueue', JSON.stringify(syncQueue));
+            localStorage.setItem('logisticaSyncTestQueue', JSON.stringify(syncQueue));
             updateNetworkStatus();
         }
 
         function processSyncQueue() {
-            if (!navigator.onLine || syncQueue.length === 0) return;
-            var task = syncQueue[0];
-            google.script.run
-                .withSuccessHandler(function() {
-                    syncQueue.shift();
-                    localStorage.setItem('logisticaSyncQueue', JSON.stringify(syncQueue));
-                    processSyncQueue();
-                })
-                .withFailureHandler(function(err) {
-                    console.log("Reintento fallido", err);
-                })
-                .guardarEnSheets(task);
+            if (syncQueue.length === 0) return;
+            syncQueue = [];
+            localStorage.setItem('logisticaSyncTestQueue', JSON.stringify(syncQueue));
+            updateNetworkStatus();
         }
 
         function toggleCustomTask() {
@@ -521,7 +578,7 @@
                 inicioFmt: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
                 finFmt: '-', duracion: '00:00:00', estado: 'EN CURSO'
             };
-            localStorage.setItem('logisticaActiveTask', JSON.stringify(activeTask));
+            localStorage.setItem('logisticaActiveTestTask', JSON.stringify(activeTask));
 
             document.getElementById('op-form').classList.add('hide');
             document.getElementById('op-active').classList.remove('hide');
@@ -539,9 +596,9 @@
                 activeTask.finFmt = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
                 safeGuardar(activeTask);
             }
-            
+
             activeTask = null;
-            localStorage.removeItem('logisticaActiveTask');
+            localStorage.removeItem('logisticaActiveTestTask');
 
             document.getElementById('stopwatch').innerText = "00:00:00";
             document.getElementById('op-form').classList.remove('hide');
@@ -561,99 +618,90 @@
                 document.getElementById('stopwatch').innerText = f;
                 if (activeTask) {
                     activeTask.duracion = f;
-                    localStorage.setItem('logisticaActiveTask', JSON.stringify(activeTask));
+                    localStorage.setItem('logisticaActiveTestTask', JSON.stringify(activeTask));
                 }
             }, 1000);
         }
 
         function updateAdminDashboard() {
             if (document.getElementById('view-admin').classList.contains('hide')) return;
-            if (!navigator.onLine) {
-                var empty = document.getElementById('empty-state');
-                document.getElementById('admin-table-body').innerHTML = "";
-                empty.style.display = "block";
-                empty.innerText = "⚠️ Sin conexión (pausado)";
-                return;
-            }
 
-            google.script.run.withSuccessHandler(function(datos) {
-                datosCompletos = datos;
-                if (tabActual === 'analisis') { renderAnalisis(datos); }
+            // Usar datos locales en vez de google.script.run
+            var datos = TEST_DATA;
+            datosCompletos = datos;
+            if (tabActual === 'analisis') { renderAnalisis(datos); return; }
 
-                var enCurso = datos.filter(function(t){ return t.estado === 'EN CURSO'; });
-                var finalizados = datos.filter(function(t){ return t.estado === 'FINALIZADO'; });
+            var enCurso = datos.filter(function(t){ return t.estado === 'EN CURSO'; });
+            var finalizados = datos.filter(function(t){ return t.estado === 'FINALIZADO'; });
 
-                var nombres = {};
-                enCurso.forEach(function(t){ nombres[t.operario] = true; });
-                document.getElementById('stat-conectados').innerText = Object.keys(nombres).length;
+            var nombres = {};
+            enCurso.forEach(function(t){ nombres[t.operario] = true; });
+            document.getElementById('stat-conectados').innerText = Object.keys(nombres).length;
 
+            document.getElementById('stat-finished').innerText = finalizados.length;
+
+            var cnt = {};
+            datos.forEach(function(t){ if(t.tarea) cnt[t.tarea] = (cnt[t.tarea]||0)+1; });
+            var topT = "-", topN = 0;
+            for (var k in cnt) { if (cnt[k] > topN) { topN = cnt[k]; topT = k; } }
+            document.getElementById('stat-top-task').innerText = topT;
+
+            var maxS = 0, maxLabel = "-";
+            datos.forEach(function(t) {
+                if (t.duracion && t.duracion.indexOf(":") > -1) {
+                    var p = t.duracion.split(":");
+                    var seg = (+p[0])*3600 + (+p[1])*60 + (+p[2]);
+                    if (seg > maxS) { maxS = seg; maxLabel = t.tarea + " (" + t.duracion + ")"; }
+                }
+            });
+            document.getElementById('stat-max-time').innerText = maxLabel;
+
+            var datosFecha = datos;
+            if (fechaFiltro) {
+                datosFecha = datos.filter(function(t){ return t.inicioMs && msToDateStr(t.inicioMs) === fechaFiltro; });
+                var filtrados = datosFecha;
+                enCurso = filtrados.filter(function(t){ return t.estado === 'EN CURSO'; });
+                finalizados = filtrados.filter(function(t){ return t.estado === 'FINALIZADO'; });
+                var noms = {};
+                enCurso.forEach(function(t){ noms[t.operario] = true; });
+                document.getElementById('stat-conectados').innerText = Object.keys(noms).length;
                 document.getElementById('stat-finished').innerText = finalizados.length;
-
-                var cnt = {};
-                datos.forEach(function(t){ if(t.tarea) cnt[t.tarea] = (cnt[t.tarea]||0)+1; });
-                var topT = "-", topN = 0;
-                for (var k in cnt) { if (cnt[k] > topN) { topN = cnt[k]; topT = k; } }
-                document.getElementById('stat-top-task').innerText = topT;
-
-                var maxS = 0, maxLabel = "-";
-                datos.forEach(function(t) {
+                var c = {};
+                filtrados.forEach(function(t){ if(t.tarea) c[t.tarea] = (c[t.tarea]||0)+1; });
+                var tt = "-", tn = 0;
+                for (var kk in c) { if (c[kk] > tn) { tn = c[kk]; tt = kk; } }
+                document.getElementById('stat-top-task').innerText = tt;
+                var ms = 0, ml = "-";
+                filtrados.forEach(function(t) {
                     if (t.duracion && t.duracion.indexOf(":") > -1) {
-                        var p = t.duracion.split(":");
-                        var seg = (+p[0])*3600 + (+p[1])*60 + (+p[2]);
-                        if (seg > maxS) { maxS = seg; maxLabel = t.tarea + " (" + t.duracion + ")"; }
+                        var p2 = t.duracion.split(":");
+                        var s2 = (+p2[0])*3600 + (+p2[1])*60 + (+p2[2]);
+                        if (s2 > ms) { ms = s2; ml = t.tarea + " (" + t.duracion + ")"; }
                     }
                 });
-                document.getElementById('stat-max-time').innerText = maxLabel;
+                document.getElementById('stat-max-time').innerText = ml;
+            }
 
-                var datosFecha = datos;
-                if (fechaFiltro) {
-                    datosFecha = datos.filter(function(t){ return t.inicioMs && msToDateStr(t.inicioMs) === fechaFiltro; });
-                    var filtrados = datosFecha;
-                    enCurso = filtrados.filter(function(t){ return t.estado === 'EN CURSO'; });
-                    finalizados = filtrados.filter(function(t){ return t.estado === 'FINALIZADO'; });
-                    var noms = {};
-                    enCurso.forEach(function(t){ noms[t.operario] = true; });
-                    document.getElementById('stat-conectados').innerText = Object.keys(noms).length;
-                    document.getElementById('stat-finished').innerText = finalizados.length;
-                    var c = {};
-                    filtrados.forEach(function(t){ if(t.tarea) c[t.tarea] = (c[t.tarea]||0)+1; });
-                    var tt = "-", tn = 0;
-                    for (var kk in c) { if (c[kk] > tn) { tn = c[kk]; tt = kk; } }
-                    document.getElementById('stat-top-task').innerText = tt;
-                    var ms = 0, ml = "-";
-                    filtrados.forEach(function(t) {
-                        if (t.duracion && t.duracion.indexOf(":") > -1) {
-                            var p2 = t.duracion.split(":");
-                            var s2 = (+p2[0])*3600 + (+p2[1])*60 + (+p2[2]);
-                            if (s2 > ms) { ms = s2; ml = t.tarea + " (" + t.duracion + ")"; }
-                        }
-                    });
-                    document.getElementById('stat-max-time').innerText = ml;
-                }
-
-                var tbody = document.getElementById('admin-table-body');
-                var empty = document.getElementById('empty-state');
-                if (datosFecha.length === 0) { tbody.innerHTML = ""; empty.style.display = "block"; empty.innerText = "No hay datos para esta fecha"; return; }
-                empty.style.display = "none";
-                var html = "";
-                for (var i = datosFecha.length - 1; i >= 0; i--) {
-                    var t = datosFecha[i];
-                    var isAct = t.estado === 'EN CURSO';
-                    var badge = isAct
-                        ? '<span class="badge badge-active pulse">EN CURSO</span>'
-                        : '<span class="badge badge-done">FINALIZADO</span>';
-                    html += '<tr>'
-                        + '<td style="font-weight:600">' + t.operario + '</td>'
-                        + '<td class="text-blue">' + t.tarea + '</td>'
-                        + '<td class="text-muted">' + (t.inicioMs ? msToShort(t.inicioMs) : t.inicioFmt) + '</td>'
-                        + '<td class="mono">' + (t.duracion || '-') + '</td>'
-                        + '<td>' + badge + '</td>'
-                        + '</tr>';
-                }
-                tbody.innerHTML = html;
-            }).withFailureHandler(function(err){
-                console.log("Error obteniendo datos", err);
-            }).obtenerDatosDeSheets();
+            var tbody = document.getElementById('admin-table-body');
+            var empty = document.getElementById('empty-state');
+            if (datosFecha.length === 0) { tbody.innerHTML = ""; empty.style.display = "block"; empty.innerText = "No hay datos para esta fecha"; return; }
+            empty.style.display = "none";
+            var html = "";
+            for (var i = datosFecha.length - 1; i >= 0; i--) {
+                var t = datosFecha[i];
+                var isAct = t.estado === 'EN CURSO';
+                var badge = isAct
+                    ? '<span class="badge badge-active pulse">EN CURSO</span>'
+                    : '<span class="badge badge-done">FINALIZADO</span>';
+                html += '<tr>'
+                    + '<td style="font-weight:600">' + t.operario + '</td>'
+                    + '<td class="text-blue">' + t.tarea + '</td>'
+                    + '<td class="text-muted">' + (t.inicioMs ? msToShort(t.inicioMs) : t.inicioFmt) + '</td>'
+                    + '<td class="mono">' + (t.duracion || '-') + '</td>'
+                    + '<td>' + badge + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
         }
 
         function renderAnalisis(datos) {
@@ -695,7 +743,6 @@
             document.getElementById('ana-operarios').innerText = operarios;
             document.getElementById('ana-tpromedio').innerText = promLabel;
 
-            /* ranking por cantidad de tareas */
             var rankingCant = Object.keys(opStats).map(function(n){
                 var dias = Object.keys(opStats[n].dias).length;
                 var prom = dias > 0 ? (opStats[n].tareas / dias).toFixed(1) : '-';
@@ -709,7 +756,6 @@
             });
             document.getElementById('ana-ranking-cant').innerHTML = htmlCant || '<li style="color:#475569;justify-content:center">Sin datos</li>';
 
-            /* ranking por tiempo promedio */
             var rankingTiempo = Object.keys(opStats).map(function(n){
                 var s = opStats[n];
                 var prom = s.totalSeg > 0 ? Math.round(s.totalSeg / s.tareas) : 0;
@@ -725,7 +771,6 @@
             });
             document.getElementById('ana-ranking-tiempo').innerHTML = htmlTiempo || '<li style="color:#475569;justify-content:center">Sin datos</li>';
 
-            /* top tareas */
             var topTareas = Object.keys(tareaCnt).map(function(n){ return {name:n, val:tareaCnt[n]}; });
             topTareas.sort(function(a,b){ return b.val - a.val; });
             topTareas = topTareas.slice(0, 10);
@@ -739,7 +784,7 @@
         }
 
         function showDetalle(tipo, extra) {
-            var datos = datosCompletos.length ? datosCompletos : [];
+            var datos = datosCompletos.length ? datosCompletos : TEST_DATA;
             var titulo = document.getElementById('modal-titulo');
             var body = document.getElementById('modal-body');
 
@@ -805,6 +850,7 @@
             } else if (tipo === 'total') {
                 titulo.innerText = '📦 Todas las tareas';
                 var h2 = '<ul>';
+                // show last 50 tasks (most recent first)
                 var sorted = datos.slice().sort(function(a,b){ return b.id - a.id; });
                 sorted.slice(0, 50).forEach(function(t){
                     var estado = t.estado === 'EN CURSO' ? '🟢' : '✅';
@@ -874,6 +920,7 @@
         function renderAlertas(datos, filtro) {
             filtro = filtro || alertaFiltroActual;
             var ahora = new Date();
+            var hoy = ahora.getFullYear()+'-'+String(ahora.getMonth()+1).padStart(2,'0')+'-'+String(ahora.getDate()).padStart(2,'0');
             var body = document.getElementById('alertas-body');
 
             var ultimaVez = {};
@@ -958,7 +1005,7 @@
             alertaFiltroActual = f;
             document.querySelectorAll('.alert-filtro-pill').forEach(function(b){ b.classList.remove('active'); });
             document.getElementById('alert-filtro-'+f).classList.add('active');
-            renderAlertas(datosCompletos.length ? datosCompletos : [], f);
+            renderAlertas(datosCompletos.length ? datosCompletos : TEST_DATA, f);
         }
 
         document.getElementById('modal-detalle').addEventListener('click', function(e) {
