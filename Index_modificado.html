@@ -349,6 +349,9 @@
         var fechaFiltro = null;
         var datosCompletos = [];
         var tabActual = 'monitor';
+        // URL del web app de Apps Script (para JSONP desde GitHub Pages)
+        var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkIBGq2vFM0fEGJHucdvkIbp4coxD3CtOGrQqV1KInpAEqIfnvZY0ftnSrzBo0y4w9/exec';
+        var ES_SANDBOX = typeof google !== 'undefined' && google.script && google.script.run;
 
         // ========== TAREAS DEL SECTOR INVENTARIO ==========
         var TAREAS_INVENTARIO = [
@@ -448,7 +451,9 @@
         }
 
         function safeGuardar(task) {
-            if (!navigator.onLine) {
+            if (!ES_SANDBOX) {
+                pushToQueue(task);
+            } else if (!navigator.onLine) {
                 pushToQueue(task);
             } else {
                 google.script.run
@@ -576,7 +581,7 @@
                 return;
             }
 
-            google.script.run.withSuccessHandler(function(datos) {
+            cargarDatos(function(datos) {
                 datosCompletos = datos;
                 if (tabActual === 'analisis') { renderAnalisis(datos); }
 
@@ -651,9 +656,7 @@
                         + '</tr>';
                 }
                 tbody.innerHTML = html;
-            }).withFailureHandler(function(err){
-                console.log("Error obteniendo datos", err);
-            }).obtenerDatosDeSheets();
+            });
         }
 
         function renderAnalisis(datos) {
@@ -964,6 +967,22 @@
         document.getElementById('modal-detalle').addEventListener('click', function(e) {
             if (e.target === this) cerrarDetalle();
         });
+
+        // Cargar datos desde Apps Script (soporta sandbox y JSONP para GitHub Pages)
+        function cargarDatos(callback) {
+            if (ES_SANDBOX) {
+                google.script.run.withSuccessHandler(callback).obtenerDatosDeSheets();
+            } else {
+                var cbName = 'jsonp_' + Date.now();
+                window[cbName] = function(data) {
+                    delete window[cbName];
+                    callback(data);
+                };
+                var s = document.createElement('script');
+                s.src = SCRIPT_URL + '?action=getData&callback=' + cbName;
+                document.head.appendChild(s);
+            }
+        }
 
         function initApp() {
             if (activeTask) {
