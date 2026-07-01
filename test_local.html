@@ -141,6 +141,42 @@
         .alert-filtro-pill:hover { border-color:#3b82f6; color:#f8fafc; }
         .alert-filtro-pill.active { background:#3b82f6; color:#fff; border-color:#3b82f6; }
         .test-badge { position:fixed; bottom:12px; right:12px; background:#f59e0b; color:#000; font-size:11px; font-weight:700; padding:6px 14px; border-radius:20px; z-index:999; opacity:.8; }
+        .worker-icon { width:80px; height:75px; position:fixed; bottom:50px; left:-100px; z-index:9999; pointer-events:none; overflow:visible; opacity:0; transition:opacity .5s; }
+        .worker-icon.show { opacity:1; }
+        .worker-icon svg { width:100%; height:100%; overflow:visible; }
+        .floating-worker { animation: roamScreen 18s linear infinite; width:80px; will-change:transform; }
+        @keyframes roamScreen {
+            0%{transform:translateX(-90px) translateY(0)} 12%{transform:translateX(25vw) translateY(-15px)} 25%{transform:translateX(50vw) translateY(0)} 37%{transform:translateX(75vw) translateY(-10px)} 50%{transform:translateX(calc(100vw + 90px)) translateY(5px)}
+            54%{transform:translateX(calc(100vw + 90px)) translateY(5px) scaleX(-1)} 62%{transform:translateX(75vw) translateY(-8px) scaleX(-1)} 75%{transform:translateX(50vw) translateY(5px) scaleX(-1)} 87%{transform:translateX(25vw) translateY(-12px) scaleX(-1)} 100%{transform:translateX(-90px) translateY(0) scaleX(-1)}
+        }
+        .floating-worker .body-group { animation: bob 1s ease-in-out infinite; }
+        @keyframes bob {
+            0%,100%{transform:translateY(0)} 25%{transform:translateY(-2.5px)} 75%{transform:translateY(1px)}
+        }
+        .floating-worker .cab { animation: cabSway 1s ease-in-out infinite; transform-origin:center top; }
+        @keyframes cabSway {
+            0%,100%{transform:rotate(0)} 25%{transform:rotate(-4deg)} 75%{transform:rotate(3deg)}
+        }
+        .floating-worker .leg-l { animation: legWalk .5s ease-in-out infinite; transform-origin:28px 62px; }
+        .floating-worker .leg-r { animation: legWalk .5s ease-in-out infinite reverse; transform-origin:52px 62px; }
+        @keyframes legWalk {
+            0%,100%{transform:rotate(-18deg)} 50%{transform:rotate(18deg)}
+        }
+        .floating-worker .arm-l { animation: armSwing .5s ease-in-out infinite; transform-origin:26px 46px; }
+        .floating-worker .arm-r { animation: armSwing .5s ease-in-out infinite reverse; transform-origin:54px 46px; }
+        @keyframes armSwing {
+            0%,100%{transform:rotate(12deg)} 50%{transform:rotate(-14deg)}
+        }
+        .floating-worker .tool-grp { animation: toolWag .5s ease-in-out infinite; transform-origin:10px 34px; }
+        @keyframes toolWag {
+            0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(15deg)}
+        }
+        .floating-shadow { position:fixed; bottom:42px; width:50px; height:6px; background:radial-gradient(rgba(0,0,0,.3),transparent 70%); border-radius:50%; z-index:9998; pointer-events:none; opacity:0; transition:opacity .5s; animation: shadowRoam 18s linear infinite; will-change:transform; }
+        .floating-shadow.show { opacity:1; }
+        @keyframes shadowRoam {
+            0%{transform:translateX(-70px)} 12%{transform:translateX(25vw)} 25%{transform:translateX(50vw)} 37%{transform:translateX(75vw)} 50%{transform:translateX(calc(100vw + 70px))}
+            54%{transform:translateX(calc(100vw + 70px)) scaleX(1)} 62%{transform:translateX(75vw)} 75%{transform:translateX(50vw)} 87%{transform:translateX(25vw)} 100%{transform:translateX(-70px) scaleX(1)}
+        }
     </style>
 </head>
 <body>
@@ -210,12 +246,73 @@
         </div>
 
         <div id="op-active" class="hide glass active-panel">
+                        
+
             <div class="badge-en-curso pulse">EN CURSO</div>
+            <div class="task-label" style="font-size:14px;color:#94a3b8" id="active-op-name"></div>
             <div class="task-label" id="active-task-name"></div>
             <div class="stopwatch" id="stopwatch">00:00:00</div>
             <button class="btn-primary btn-red" onclick="stopTask()">TERMINAR TAREA</button>
         </div>
     </div>
+
+    <div class="worker-icon">
+        <div class="floating-worker">
+            <svg viewBox="0 0 80 95" fill="none">
+                <g class="body-group">
+                    <defs>
+                        <radialGradient id="skinGrad" cx="40%" cy="30%"><stop offset="0%" stop-color="#fcd34d"/><stop offset="100%" stop-color="#f59e0b"/></radialGradient>
+                        <radialGradient id="overallGrad" cx="40%" cy="20%"><stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#2563eb"/></radialGradient>
+                        <radialGradient id="helmetGrad" cx="40%" cy="20%"><stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#eab308"/></radialGradient>
+                        <radialGradient id="bootGrad"><stop offset="0%" stop-color="#475569"/><stop offset="100%" stop-color="#1e293b"/></radialGradient>
+                    </defs>
+                    <g class="leg-l">
+                        <rect x="30" y="62" width="8" height="18" rx="3" fill="url(#overallGrad)" stroke="#1d4ed8" stroke-width=".8"/>
+                        <rect x="29" y="78" width="10" height="8" rx="2.5" fill="url(#bootGrad)" stroke="#0f172a" stroke-width=".6"/>
+                    </g>
+                    <g class="leg-r">
+                        <rect x="42" y="62" width="8" height="18" rx="3" fill="url(#overallGrad)" stroke="#1d4ed8" stroke-width=".8"/>
+                        <rect x="41" y="78" width="10" height="8" rx="2.5" fill="url(#bootGrad)" stroke="#0f172a" stroke-width=".6"/>
+                    </g>
+                    <rect x="26" y="32" width="28" height="32" rx="7" fill="url(#overallGrad)" stroke="#1d4ed8" stroke-width="1"/>
+                    <rect x="28" y="32" width="5" height="12" rx="2" fill="#2563eb" stroke="#1d4ed8" stroke-width=".5"/>
+                    <rect x="47" y="32" width="5" height="12" rx="2" fill="#2563eb" stroke="#1d4ed8" stroke-width=".5"/>
+                    <rect x="44" y="52" width="7" height="6" rx="1.5" fill="#1d4ed8" stroke="#1e3a5f" stroke-width=".5"/>
+                    <rect x="27" y="52" width="7" height="6" rx="1.5" fill="#1d4ed8" stroke="#1e3a5f" stroke-width=".5"/>
+                    <g class="cab">
+                        <circle cx="40" cy="18" r="13" fill="url(#skinGrad)" stroke="#d97706" stroke-width="1.2"/>
+                        <path d="M25 14 Q40 -2 55 14" fill="url(#helmetGrad)" stroke="#ca8a04" stroke-width="1.5"/>
+                        <path d="M25 14 Q27 20 32 18" fill="url(#helmetGrad)" stroke="#ca8a04" stroke-width=".8"/>
+                        <ellipse cx="36" cy="16" rx="2" ry="2.5" fill="#fff" opacity=".3"/>
+                        <circle cx="34" cy="19" r="1.8" fill="#1e293b"/>
+                        <circle cx="46" cy="19" r="1.8" fill="#1e293b"/>
+                        <circle cx="34.5" cy="18.5" r=".6" fill="#fff" opacity=".6"/>
+                        <circle cx="46.5" cy="18.5" r=".6" fill="#fff" opacity=".6"/>
+                        <ellipse cx="37" cy="22" rx=".8" ry=".5" fill="#d97706" opacity=".4"/>
+                        <ellipse cx="43" cy="22" rx=".8" ry=".5" fill="#d97706" opacity=".4"/>
+                        <path d="M36 24 Q40 28 44 24" fill="none" stroke="#b45309" stroke-width="1.2" stroke-linecap="round"/>
+                        <circle cx="40" cy="21" r="2.5" fill="#fca5a5" opacity=".5"/>
+                    </g>
+                    <g class="arm-l">
+                        <rect x="16" y="36" width="10" height="7" rx="3.5" fill="url(#skinGrad)" stroke="#d97706" stroke-width=".8"/>
+                        <circle cx="16" cy="39" r="3.5" fill="url(#skinGrad)" stroke="#d97706" stroke-width=".6"/>
+                        <g class="tool-grp">
+                            <rect x="-2" y="30" width="14" height="4" rx="1.5" fill="#78716c" stroke="#44403c" stroke-width=".6"/>
+                            <rect x="-4" y="28" width="5" height="8" rx="1" fill="#a8a29e" stroke="#44403c" stroke-width=".5"/>
+                            <rect x="8" y="32" width="6" height="2" rx=".5" fill="#f59e0b"/>
+                        </g>
+                    </g>
+                    <g class="arm-r">
+                        <rect x="54" y="36" width="10" height="7" rx="3.5" fill="url(#skinGrad)" stroke="#d97706" stroke-width=".8"/>
+                        <circle cx="64" cy="39" r="3.5" fill="url(#skinGrad)" stroke="#d97706" stroke-width=".6"/>
+                    </g>
+                    <rect x="25" y="60" width="30" height="5" rx="2" fill="#1d4ed8" stroke="#1e3a5f" stroke-width=".5"/>
+                    <rect x="38" y="61" width="4" height="3" rx="1" fill="#eab308"/>
+                </g>
+            </svg>
+        </div>
+    </div>
+    <div class="floating-shadow"></div>
 
     <!-- ============ ADMIN ============ -->
     <div id="view-admin" class="hide">
@@ -566,6 +663,13 @@
             if (v === 'admin') { document.getElementById('view-admin').classList.remove('hide'); switchAdminTab('monitor'); }
         }
 
+        function showFloatingWorker(show) {
+            var el = document.querySelector('.worker-icon');
+            var sh = document.querySelector('.floating-shadow');
+            if (el) el.classList.toggle('show', show);
+            if (sh) sh.classList.toggle('show', show);
+        }
+
         function startTask() {
             var opName = document.getElementById('op-name').value;
             var opTask = getTaskValue();
@@ -582,8 +686,10 @@
 
             document.getElementById('op-form').classList.add('hide');
             document.getElementById('op-active').classList.remove('hide');
+            document.getElementById('active-op-name').innerText = opName;
             document.getElementById('active-task-name').innerText = opTask;
             startStopwatch(now.getTime());
+            showFloatingWorker(true);
 
             safeGuardar(activeTask);
         }
@@ -606,6 +712,7 @@
             document.getElementById('op-task').value = "";
             document.getElementById('op-task-custom').value = "";
             document.getElementById('op-task-custom').classList.add('hide');
+            showFloatingWorker(false);
         }
 
         function startStopwatch(startMs) {
@@ -1016,8 +1123,10 @@
             if (activeTask) {
                 document.getElementById('op-form').classList.add('hide');
                 document.getElementById('op-active').classList.remove('hide');
+                document.getElementById('active-op-name').innerText = activeTask.operario || "";
                 document.getElementById('active-task-name').innerText = activeTask.tarea;
                 startStopwatch(activeTask.inicioMs);
+                showFloatingWorker(true);
                 document.getElementById('op-name').value = activeTask.operario || "";
                 var taskSelect = document.getElementById('op-task');
                 var taskCustom = document.getElementById('op-task-custom');
